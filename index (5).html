@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AmirHKD — Portfolio</title>
+<meta name="description" content="AmirHossein (AmirHKD) — Computer Engineering student, Python developer, building tools with AI." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0c10;--surface:#111318;--surface-2:#181c23;--border:#1e2430;--accent:#5b8dee;--accent-dim:#3a6bc8;--green:#3ecf8e;--amber:#f0a050;--text:#e2e8f4;--text-muted:#6b7a96;--text-dim:#3d4a60}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;font-family:Space Grotesk,sans-serif;font-size:15px;line-height:1.6;overflow-x:hidden}
+.mono{font-family:'JetBrains Mono',monospace}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit}
+
+/* noise + canvas */
+.noise-bg{position:relative}
+.noise-bg:before{content:"";pointer-events:none;z-index:0;opacity:.4;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");position:fixed;inset:0}
+#stars{position:fixed;inset:0;z-index:0;pointer-events:none}
+#glow{position:fixed;width:520px;height:520px;border-radius:50%;pointer-events:none;z-index:1;background:radial-gradient(circle,rgba(91,141,238,.07) 0%,transparent 60%);transform:translate(-50%,-50%);transition:opacity .3s}
+
+/* left dot nav */
+.dotnav{position:fixed;left:24px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:16px;z-index:50}
+@media(max-width:1023px){.dotnav{display:none}}
+.dotnav button{display:flex;align-items:center;gap:8px;background:none;border:none;cursor:pointer;font-size:12px;color:var(--text-muted)}
+.dotnav .d{width:4px;height:4px;border-radius:99px;background:var(--text-dim);transition:all .25s}
+.dotnav button:hover .d,.dotnav button.active .d{width:12px;background:var(--accent);box-shadow:0 0 8px var(--accent)}
+.dotnav .lbl{opacity:0;transition:opacity .2s}
+.dotnav button:hover .lbl,.dotnav button.active .lbl{opacity:1}
+.dotnav button.active{color:var(--accent)}
+
+/* header */
+header{position:fixed;top:0;left:0;right:0;z-index:50;transition:all .3s;border-bottom:1px solid transparent}
+header.scrolled{border-bottom:1px solid var(--border);backdrop-filter:blur(12px);background:rgba(10,12,16,.85)}
+header .inner{max-width:56rem;margin:0 auto;padding:16px 24px;display:flex;justify-content:space-between;align-items:center}
+header .logo{font-size:14px;color:var(--accent)}
+header a.gh{font-size:12px;display:flex;align-items:center;gap:8px;color:var(--text-muted);transition:color .2s}
+header a.gh:hover{color:var(--accent)}
+
+/* sections */
+section{max-width:56rem;margin:0 auto;padding:96px 24px;position:relative;z-index:2}
+.min-h-screen{min-height:100vh}
+.label{font-size:12px;letter-spacing:.1em;color:var(--text-dim);margin-bottom:24px}
+h1.hero-name{font-size:clamp(2.4rem,7vw,5rem);font-weight:700;line-height:1.05;letter-spacing:-.03em}
+.hero-sub{margin-top:12px;margin-bottom:32px;font-size:clamp(1rem,2.5vw,1.4rem);color:var(--text-muted);font-weight:300;max-width:40ch;line-height:1.5}
+h2.sec{font-size:1.6rem;font-weight:600;margin-bottom:1rem}
+h2.sec.mb2{margin-bottom:2rem}
+p.mut{color:var(--text-muted)}
+.lead{margin-bottom:1rem;line-height:1.625}
+.hero-glow{position:absolute;right:0;top:0;width:50%;height:100vh;pointer-events:none;opacity:.3;background-image:radial-gradient(circle at 70% 30%,rgba(91,141,238,.07) 0%,transparent 60%)}
+
+/* buttons */
+.btn-row{display:flex;flex-wrap:wrap;gap:12px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:6px;font-size:14px;cursor:pointer;transition:all .2s}
+.btn-ghost{background:var(--surface);border:1px solid var(--border);color:var(--text)}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-2px)}
+.btn-acc{background:var(--accent);color:#fff;border:1px solid transparent}
+.btn-acc:hover{background:var(--accent-dim);transform:translateY(-2px);box-shadow:0 8px 24px rgba(91,141,238,.25)}
+
+/* grids */
+.grid2{display:grid;gap:48px}
+@media(min-width:768px){.grid2{grid-template-columns:1fr 1fr}}
+.code-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:20px;transition:border-color .3s}
+.code-card:hover{border-color:rgba(91,141,238,.4)}
+.code-card .k{color:var(--accent)}.code-card .c{color:var(--text-muted)}.code-card .v{color:var(--green)}.code-card .p{color:var(--text-dim)}
+.projects{display:grid;gap:16px}
+@media(min-width:768px){.projects{grid-template-columns:1fr 1fr}}
+
+/* project card */
+.pcard{position:relative;border-radius:8px;padding:20px;cursor:default;background:var(--surface);border:1px solid var(--border);transition:all .3s;will-change:transform}
+.pcard:hover{background:var(--surface-2)}
+.badge{position:absolute;top:12px;right:12px;font-size:12px;padding:2px 8px;border-radius:4px}
+.pcard .head{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px}
+.pcard .icon{font-size:24px;line-height:1}
+.pcard h3{font-weight:600;font-size:15px;line-height:1.3}
+.pcard .tag{font-size:12px;margin-top:2px}
+.pcard .desc{font-size:14px;margin-bottom:16px;line-height:1.625;color:var(--text-muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.chip{font-size:12px;padding:2px 8px;border-radius:4px}
+.chip.lang{background:var(--bg);color:var(--text-muted);border:1px solid var(--border)}
+.chip.tag{color:var(--text-dim)}
+.plink{display:inline-flex;align-items:center;gap:6px;font-size:12px;transition:color .2s}
+
+/* contact */
+.contact-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:32px;text-align:center;transition:border-color .3s}
+.contact-card:hover{border-color:rgba(91,141,238,.4)}
+.contact-card p{max-width:65ch;margin:0 auto 24px;color:var(--text-muted)}
+
+footer{max-width:56rem;margin:0 auto;padding:32px 24px;text-align:center;position:relative;z-index:2}
+footer p{font-size:12px;color:var(--text-dim)}
+
+
+/* skills section */
+.skills{display:flex;flex-direction:column;gap:18px;max-width:52rem}
+.skill{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px 20px;transition:border-color .3s,box-shadow .3s,transform .3s}
+.skill:hover{border-color:var(--sc);box-shadow:0 0 20px color-mix(in srgb,var(--sc) 12%,transparent);transform:translateY(-2px)}
+.skill .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.skill .name{font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px}
+.skill .name .dot{width:6px;height:6px;border-radius:99px;background:var(--sc);box-shadow:0 0 6px var(--sc)}
+.skill .lvl{font-family:'JetBrains Mono',monospace;font-size:11px;padding:2px 10px;border-radius:4px;color:var(--sc);background:color-mix(in srgb,var(--sc) 12%,transparent);border:1px solid color-mix(in srgb,var(--sc) 30%,transparent)}
+.bar{height:6px;border-radius:99px;background:var(--surface-2);overflow:hidden;position:relative}
+.bar .fill{height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,color-mix(in srgb,var(--sc) 55%,transparent),var(--sc));box-shadow:0 0 10px color-mix(in srgb,var(--sc) 45%,transparent);transition:width 1.2s cubic-bezier(.4,0,.2,1)}
+.bar .fill:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.14),transparent);animation:shimmer 2.4s linear infinite;transform:translateX(-100%)}
+@keyframes shimmer{100%{transform:translateX(100%)}}
+.skill .sub{font-size:12px;color:var(--text-dim);margin-top:8px;font-family:'JetBrains Mono',monospace}
+@media(max-width:767px){.skill .top{flex-direction:column;align-items:flex-start;gap:6px}}
+
+/* reveal animations */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .7s cubic-bezier(.4,0,.2,1),transform .7s cubic-bezier(.4,0,.2,1)}
+.reveal.in{opacity:1;transform:none}
+.reveal.d1{transition-delay:.1s}.reveal.d2{transition-delay:.2s}.reveal.d3{transition-delay:.3s}
+
+/* typing caret */
+.caret{display:inline-block;width:2px;height:1em;background:var(--accent);vertical-align:-.12em;margin-left:2px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+
+/* scroll hint */
+.scroll-hint{position:absolute;bottom:32px;left:24px;display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text-dim)}
+.scroll-hint .line{width:1px;height:36px;background:linear-gradient(var(--accent),transparent);animation:drip 1.8s ease-in-out infinite}
+@keyframes drip{0%{transform:scaleY(0);transform-origin:top}45%{transform:scaleY(1);transform-origin:top}55%{transform:scaleY(1);transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+</style>
+</head>
+<body>
+<div class="noise-bg" style="min-height:100vh">
+<canvas id="stars"></canvas>
+<div id="glow"></div>
+
+<nav class="dotnav" id="dotnav">
+  <button data-t="hero"><span class="d"></span><span class="lbl">Home</span></button>
+  <button data-t="about"><span class="d"></span><span class="lbl">About</span></button>
+  <button data-t="projects"><span class="d"></span><span class="lbl">Projects</span></button>
+  <button data-t="skills"><span class="d"></span><span class="lbl">Skills</span></button>
+  <button data-t="contact"><span class="d"></span><span class="lbl">Contact</span></button>
+</nav>
+
+<header id="hdr">
+  <div class="inner">
+    <span class="mono logo">AmirHKD</span>
+    <a class="mono gh" href="https://github.com/AmirHKD1386" target="_blank" rel="noopener noreferrer">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+      AmirHKD1386</a>
+  </div>
+</header>
+
+<section id="hero" class="min-h-screen flex flex-col" style="justify-content:center;padding-top:96px;padding-bottom:64px">
+  <div class="hero-glow"></div>
+  <div class="reveal in"><div class="mb-6"><span class="mono text-xs tracking-widest" style="color:var(--text-dim)">امیرحسین • CS Student</span></div></div>
+  <div class="reveal in d1"><h1 class="hero-name">AmirHKD</h1></div>
+  <div class="reveal in d2"><div class="hero-sub">Computer Engineering student who builds tools that <span style="color:var(--text)">actually solve something</span>. Python-first, ML-curious, obsessed with <span style="color:var(--accent)">discrete math</span>.</div></div>
+  <div class="reveal in d3 btn-row">
+    <a class="btn mono btn-ghost" href="https://github.com/AmirHKD1386" target="_blank" rel="noopener noreferrer">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+      GitHub</a>
+    <button class="btn mono btn-acc" onclick="document.getElementById('projects').scrollIntoView({behavior:'smooth'})">See projects ↓</button>
+    <a class="btn mono btn-ghost" href="https://www.linkedin.com/in/amirhossein-kiadaliri-766693308/" target="_blank" rel="noopener noreferrer"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z"/></svg> LinkedIn</a>
+  </div>
+  <div class="scroll-hint mono"><span class="line"></span>scroll</div>
+</section>
+
+<section id="about">
+  <div class="mono text-xs label">// about</div>
+  <div class="grid2">
+    <div class="reveal">
+      <h2 class="sec">Building things that matter.</h2>
+      <p class="mut lead">I'm AmirHossein, a Computer Engineering student still deep in my studies. My approach: pick a real problem, vibe-code a solution, ship it, and see if it actually works. It usually does.</p>
+      <p class="mut lead">Discrete mathematics is where my head lives most of the time — the elegance of graph theory, combinatorics, and formal proofs genuinely excites me. Python is my main tool for turning ideas into code. Currently diving into Machine Learning to close the gap between theory and models.</p>
+    </div>
+    <div class="reveal d1">
+      <div class="code-card">
+        <p class="mono text-xs" style="color:var(--text-dim);margin-bottom:16px">const amirhkd = {</p>
+        <div class="mono text-sm" style="margin-bottom:6px;padding-left:16px"><span class="k">alias</span><span class="c">: </span><span class="v">"AmirHKD"</span><span class="p">,</span></div>
+        <div class="mono text-sm" style="margin-bottom:6px;padding-left:16px"><span class="k">status</span><span class="c">: </span><span class="v">"Student @ CS"</span><span class="p">,</span></div>
+        <div class="mono text-sm" style="margin-bottom:6px;padding-left:16px"><span class="k">python</span><span class="c">: </span><span class="v">"Advanced"</span><span class="p">,</span></div>
+        <div class="mono text-sm" style="margin-bottom:6px;padding-left:16px"><span class="k">learning</span><span class="c">: </span><span class="v">["ML", "Deep Learning"]</span><span class="p">,</span></div>
+        <div class="mono text-sm" style="margin-bottom:6px;padding-left:16px"><span class="k">loves</span><span class="c">: </span><span class="v">"Discrete Math"</span><span class="p">,</span></div>
+        <div class="mono text-sm" style="margin-bottom:6px;padding-left:16px"><span class="k">style</span><span class="c">: </span><span class="v">"vibe-code → ship"</span><span class="p">,</span></div>
+        <p class="mono text-xs" style="color:var(--text-dim);margin-top:12px">};</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="projects">
+  <div class="mono text-xs label">// projects</div>
+  <h2 class="sec mb2 reveal">What I've built</h2>
+  <div class="projects" id="pcards"></div>
+</section>
+
+<section id="skills">
+  <div class="mono text-xs label">// skills</div>
+  <h2 class="sec mb2 reveal">Languages &amp; Tech I'm growing in</h2>
+  <div class="skills" id="skillsWrap"></div>
+</section>
+
+<section id="contact">
+  <div class="mono text-xs label">// contact</div>
+  <div class="contact-card reveal">
+    <h2 class="sec" style="margin-bottom:.75rem">Want to connect?</h2>
+    <p>Find me on GitHub. All my work lives there — open an issue, send a PR, or just follow along.</p>
+    <a class="btn mono btn-acc" style="padding:12px 24px" href="https://github.com/AmirHKD1386" target="_blank" rel="noopener noreferrer">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+      github.com/AmirHKD1386</a>
+    <div style="margin-top:12px"></div>
+    <a class="btn mono btn-ghost" style="padding:12px 24px" href="https://www.linkedin.com/in/amirhossein-kiadaliri-766693308/" target="_blank" rel="noopener noreferrer"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z"/></svg> Connect on LinkedIn</a>
+  </div>
+</section>
+
+<footer><p class="mono">AmirHKD — امیرحسین • built with React • <span id="yr"></span></p></footer>
+</div>
+
+<script>
+const PROJECTS=[
+ {name:"Folio — AI Book Studio",tagline:"Give it an outline. Take home a finished manuscript.",desc:"A local-first multi-agent writing desk. Connects to any OpenAI-compatible AI (cloud or local), writes chapters with memory between them, and exports a fully styled .docx with RTL support for Persian and Arabic.",lang:["TypeScript","React 19","Node.js"],tags:["AI","Multi-agent","Local-first","RTL"],url:"https://github.com/AmirHKD1386/folio-ai-book-studio",star:true,icon:"📖",color:"#5b8dee"},
+ {name:"DNS Benchmarker",tagline:"Find which DNS actually lets you through.",desc:"Full-stack local web app that probes DNS resolvers against a list of domains in real-time using SSE. Classifies servers into Tier A/B/F cards and lets you apply the best one system-wide with one click. Built for filtered internet regions.",lang:["Python","FastAPI","React"],tags:["Network","Privacy","FastAPI","asyncio"],url:"https://github.com/AmirHKD1386/DNS-Benchmarker",star:false,icon:"🌐",color:"#3ecf8e"},
+ {name:"Proje_self — Cafeteria Scheduler",tagline:"University project in C++ for cafeteria scheduling.",desc:"A C++ system designed to handle a university cafeteria's schedule and weekly menu. First steps into systems programming, built as a self project at university.",lang:["C++"],tags:["Systems","University","CLI"],url:"https://github.com/AmirHKD1386/Proje_self",star:false,icon:"🍽️",color:"#f0a050"},
+ {name:"Airline Ticketing System",tagline:"Full desktop app for airline management — university final project.",desc:"A complete airline ticketing desktop app built with Python. Supports aircraft management, tiered seat pricing, hall/lounge systems, flight search, ticket issuance with full conflict detection, cancellations, and a live revenue statistics dashboard. Built with CustomTkinter and Matplotlib.",lang:["Python","CustomTkinter","Matplotlib"],tags:["Desktop","GUI","University","OOP"],url:"https://github.com/AmirHKD1386/airline-ticketing-system",star:false,icon:"✈️",color:"#a78bfa"},
+ {name:"Telegram Notes Bot",tagline:"Smart Telegram bot for university notes — Google Drive powered.",desc:"A Telegram bot that gives students instant access to course materials stored on Google Drive. Features dynamic file listing, OAuth2 auto-refresh, admin upload panel, duplicate file detection, per-day unique user stats, and Webhook/Flask architecture for cloud deployment.",lang:["Python","Flask","pyTelegramBotAPI"],tags:["Telegram","Bot","Google Drive","Webhook"],url:"https://github.com/AmirHKD1386/telegram-notes-bot",star:false,icon:"🤖",color:"#3ecf8e"}
+];
+const GH='<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>';
+const wrap=document.getElementById('pcards');
+PROJECTS.forEach((p,i)=>{
+  const c=document.createElement('div');
+  c.className='pcard reveal'; if(i%2)c.classList.add('d1');
+  c.innerHTML=`
+    ${p.star?`<div class="badge mono" style="background:${p.color}22;color:${p.color};border:1px solid ${p.color}44">★ flagship</div>`:''}
+    <div class="head"><span class="icon">${p.icon}</span>
+      <div><h3>${p.name}</h3><p class="tag mono" style="color:${p.color}">${p.tagline}</p></div></div>
+    <p class="desc">${p.desc}</p>
+    <div class="chips">${p.lang.map(l=>`<span class="chip mono lang">${l}</span>`).join('')}${p.tags.map(t=>`<span class="chip tag">#${t}</span>`).join('')}</div>
+    <a class="plink mono" href="${p.url}" target="_blank" rel="noopener noreferrer" style="color:var(--text-muted)">${GH}View on GitHub →</a>`;
+  wrap.appendChild(c);
+  c.addEventListener('mouseenter',()=>{c.style.borderColor=p.color+'44';c.style.boxShadow=`0 0 24px ${p.color}18`;c.querySelector('.plink').style.color=p.color;});
+  c.addEventListener('mouseleave',()=>{c.style.borderColor='var(--border)';c.style.boxShadow='none';c.querySelector('.plink').style.color='var(--text-muted)';});
+  // subtle 3d tilt
+  c.addEventListener('mousemove',e=>{
+    const r=c.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;
+    c.style.transform=`perspective(800px) rotateY(${x*4}deg) rotateX(${-y*4}deg) translateY(-2px)`;
+  });
+  c.addEventListener('mouseleave',()=>{c.style.transform='';});
+});
+
+
+// skills — render + animate
+const SKILLS=[
+ {name:"Python",pct:92,lvl:"Advanced",sub:"main weapon — scripts, bots, desktop apps",c:"#5b8dee"},
+ {name:"C++",pct:68,lvl:"Intermediate",sub:"systems thinking, university projects",c:"#3ecf8e"},
+ {name:"Git",pct:62,lvl:"Intermediate",sub:"daily driver — commit, branch, push, PR",c:"#f0a050"},
+ {name:"HTML & CSS",pct:55,lvl:"Strengthening",sub:"leveling up the frontend craft",c:"#a78bfa"},
+ {name:"Machine Learning",pct:32,lvl:"Learning",sub:"the current obsession — theory → models",c:"#f472b6"}
+];
+const sw=document.getElementById('skillsWrap');
+SKILLS.forEach((s,i)=>{
+  const d=document.createElement('div');
+  d.className='skill reveal'; if(i%2)d.classList.add('d1');
+  d.style.setProperty('--sc',s.c);
+  d.innerHTML=`<div class="top"><span class="name"><span class="dot"></span>${s.name}</span><span class="lvl">${s.lvl} · ${s.pct}%</span></div>
+    <div class="bar"><div class="fill" data-w="${s.pct}"></div></div>
+    <div class="sub">${s.sub}</div>`;
+  sw.appendChild(d);
+});
+const sio=new IntersectionObserver(es=>es.forEach(e=>{
+  if(e.isIntersecting){e.target.querySelectorAll('.fill').forEach(f=>f.style.width=f.dataset.w+'%');sio.unobserve(e.target);}
+}),{threshold:.25});
+sio.observe(sw);
+
+// header blur
+const hdr=document.getElementById('hdr');
+addEventListener('scroll',()=>hdr.classList.toggle('scrolled',scrollY>40),{passive:true});
+
+// dot nav
+const dots=[...document.querySelectorAll('#dotnav button')];
+dots.forEach(b=>b.onclick=()=>document.getElementById(b.dataset.t).scrollIntoView({behavior:'smooth'}));
+const secs=['hero','about','projects','skills','contact'].map(id=>document.getElementById(id));
+addEventListener('scroll',()=>{
+  let cur='hero';
+  secs.forEach(s=>{if(scrollY>=s.offsetTop-200)cur=s.id});
+  dots.forEach(b=>b.classList.toggle('active',b.dataset.t===cur));
+},{passive:true});
+
+// reveal on scroll
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.15});
+document.querySelectorAll('.reveal:not(.in)').forEach(el=>io.observe(el));
+
+// cursor glow
+const glow=document.getElementById('glow');
+addEventListener('mousemove',e=>{glow.style.left=e.clientX+'px';glow.style.top=e.clientY+'px';},{passive:true});
+
+// starfield canvas — slow drifting particles + rare shooting lines
+const cv=document.getElementById('stars'),ctx=cv.getContext('2d');
+let W,H,ps=[],meteors=[];
+function resize(){W=cv.width=innerWidth;H=cv.height=innerHeight;
+  ps=Array.from({length:Math.min(90,W/14)},()=>({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.3+.3,vx:(Math.random()-.5)*.12,vy:(Math.random()-.5)*.12,a:Math.random()*.5+.15,tw:Math.random()*Math.PI*2}));}
+resize();addEventListener('resize',resize);
+function tick(){
+  ctx.clearRect(0,0,W,H);
+  ps.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.tw+=.02;
+    if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;
+    ctx.globalAlpha=p.a*(.6+.4*Math.sin(p.tw));
+    ctx.fillStyle='#5b8dee';ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,7);ctx.fill();});
+  ctx.globalAlpha=1;
+  if(Math.random()<.004&&meteors.length<2)meteors.push({x:Math.random()*W*.8,y:Math.random()*H*.3,vx:3.5,vy:1.6,life:1});
+  meteors=meteors.filter(m=>m.life>0);
+  meteors.forEach(m=>{m.x+=m.vx;m.y+=m.vy;m.life-=.012;
+    const g=ctx.createLinearGradient(m.x,m.y,m.x-m.vx*14,m.y-m.vy*14);
+    g.addColorStop(0,`rgba(91,141,238,${.5*m.life})`);g.addColorStop(1,'rgba(91,141,238,0)');
+    ctx.strokeStyle=g;ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(m.x,m.y);ctx.lineTo(m.x-m.vx*14,m.y-m.vy*14);ctx.stroke();});
+  requestAnimationFrame(tick);
+}
+tick();
+
+// typing effect for hero subtitle
+const sub=document.querySelector('.hero-sub');
+const parts=[{t:'Computer Engineering student who builds tools that ',c:'var(--text-muted)'},{t:'actually solve something',c:'var(--text)'},{t:'. Python-first, ML-curious, obsessed with ',c:'var(--text-muted)'},{t:'discrete math',c:'var(--accent)'},{t:'.',c:'var(--text-muted)'}];
+const full=parts.map(p=>p.t).join('');
+let ci=0;
+function type(){
+  if(ci<=full.length){
+    let html='',n=0;
+    for(const p of parts){const take=Math.max(0,Math.min(p.t.length,ci-n));html+=`<span style="color:${p.c}">${p.t.slice(0,take)}</span>`;n+=p.t.length;}
+    sub.innerHTML=html+'<span class="caret"></span>';
+    ci++;setTimeout(type,18+Math.random()*22);
+  }
+}
+setTimeout(type,600);
+
+document.getElementById('yr').textContent=new Date().getFullYear();
+</script>
+</body>
+</html>
