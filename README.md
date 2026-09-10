@@ -32,7 +32,7 @@
 | **Folio — AI Book Studio** | استودیوی هوش مصنوعی برای نوشتن کتاب؛ خروجی Word با پشتیبانی RTL فارسی | JS · React · Node.js | [مشاهده](https://github.com/AmirHKD1386/folio-ai-book-studio) |
 | **DNS Benchmarker** | تست و رتبه‌بندی DNS سرورها با نمایش آنلاین نتایج | Python · FastAPI · HTML | [مشاهده](https://github.com/AmirHKD1386/DNS-Benchmarker) |
 | **Proje_self** | سیستم مدیریت زمان‌بندی کافه‌تریای دانشگاه | C++ | [مشاهده](https://github.com/AmirHKD1386/Proje_self) |
-| **سیستم راهبری هواپیما** | منطق ناوبری و محاسبات مسیر هواپیما | Python | به‌زودی |
+| **سیستم راهبری هواپیما** | منطق ناوبری و محاسبات مسیر هواپیما | Python | [مشاهده](https://github.com/AmirHKD1386/airline-ticketing-system) |
 
 ---
 
