@@ -50,7 +50,7 @@
 
 ## 🌐 سایت شخصی
 
-**([https://amirhkd1386.github.io](https://amirhkd1386.github.io/AmirHKD.github.io/))**
+**[https://amirhkd1386.github.io](https://amirhkd1386.github.io/AmirHKD.github.io/)**
 
 ---
 
