@@ -1,12 +1,11 @@
 # AmirHKD1386.github.io
 <div dir="rtl">
 
-<img src="https://github.com/AmirHKD1386/desktop-tutorial/blob/main/photo_2025-11-19_12-19-07.jpg" width="120" align="left" style="margin-left:16px; border-radius:8px"/>
 
 # امیرحسین کیادلیری — AmirHKD
 
 **دانشجوی مهندسی کامپیوتر**
-
+<img src="https://github.com/AmirHKD1386/desktop-tutorial/blob/main/photo_2025-11-19_12-19-07.jpg" width="120" align="left" style="margin-left:16px; border-radius:8px"/>
 عاشق ریاضیات گسسته | Python پیشرفته | در حال یادگیری Machine Learning
 
 <br clear="left"/>
